@@ -1,0 +1,7 @@
+{
+  "server": "0.0.0.0",
+  "server_port": 9600,
+  "password": "aw42a49AiXiJ56p6",
+  "method": "aes-256-cfb",
+  "mode": "tcp_and_udp"
+}

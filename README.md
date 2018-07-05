@@ -1,19 +1,14 @@
 # sasori/赤砂之蝎/サソリ 
 
-Wrap and compose shell commands by clojure.
-
-<img src="https://github.com/defclass/sasori/blob/master/assets/sasori.jpg" width="600">
+Sasori is a lightweight shell command wrapper and composer. This is very early version, please feel free to submit bugs/thoughts/ideas/suggestions/patches etc.
 
 ## Features
 
-* 可灵活地组合shell命令.
-* REPL友好, 调试方便.
-* 简单函数组合, 高度可扩展.
-* 支持灵活的模板方案.
-* 支持灵活的配置方案.
-* 支持多节点顺序和并行部署.
-* 支持彩色输出.
-* 支持实时log输出(方便hung时判断程序的状态), 是的, 并行时也支持. 
+* Using function to compose shell commands.
+* REPL friendly.
+* Support customizable template engine. 
+* Support executing commands sequentially and parallelly on different nodes.
+* Support colorful and real-time logging output. 
 
 ## Usage
 

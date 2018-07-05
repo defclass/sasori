@@ -62,7 +62,7 @@
   [m ks]
   (let [f (fn [k]
             `(when-not (contains? ~m ~k)
-               (u/error! (format "safe-let: Key %s is not exist in %s" ~k ~m))))]
+               (u/error! (format "Safe-let: Key %s is not exist in %s" ~k ~m))))]
     `(do ~@(map f ks))))
 
 (defn- insert-validator
@@ -78,8 +78,8 @@
 
 (defmacro safe-let
   [bindings & body]
-  (assert (vector? bindings) "a vector for its binding")
-  (assert (even? (count bindings)) "an even number of forms in binding vector")
+  (assert (vector? bindings) "Binding is not a vector.")
+  (assert (even? (count bindings)) "An even number of forms in binding vector.")
   (let [binding-entries (partition 2 bindings)
         new-bindings (insert-validator binding-entries)]
     `(let ~new-bindings
@@ -206,7 +206,7 @@
 
   Return:
 
-  {:hostname \"hostname\" :username \"some-username\\\"}"
+  {:hostname \"hostname\" :username \"some-username\"}"
   [args]
   (when (seq args)
     (read-string (first args))))

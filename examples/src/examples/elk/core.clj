@@ -1,5 +1,5 @@
 (ns examples.elk.core
-  "部署开箱即用的elk日志服务."
+  "To deploy out of the box elk logging service."
   (:require [sasori
              [core :as sasori]
              [dsl :as dsl]])

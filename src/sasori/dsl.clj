@@ -146,7 +146,7 @@
 (defn- build-rsync-dest
   [host-info dest-path]
   (assert (instance? HostInfo host-info) "Should be HostInfo instance.")
-  (when-not (string? dest-path) (u/error! "dest-path should be string."))
+  (when-not (string? dest-path) (u/error! "Dest-path should be string."))
   (let [{:keys [host hostname username]} host-info]
     (if host
      (str host ":" dest-path)

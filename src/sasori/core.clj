@@ -188,7 +188,7 @@
 (defn seq-tasks [init-msgs vars]
   {:pre [(and (sequential? vars)
               (every? var? vars))]}
-  (do-tasks pmap init-msgs vars))
+  (do-tasks map init-msgs vars))
 
 (defmacro task-vars
   "Generate task vars from sequence of symbols."

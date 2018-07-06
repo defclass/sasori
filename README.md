@@ -1,4 +1,5 @@
 # sasori/赤砂之蝎/サソリ 
+[![Build Status](https://travis-ci.org/defclass/sasori.svg?branch=master)](https://travis-ci.org/defclass/sasori)
 
 Sasori is a lightweight shell command wrapper and composer. This is very early version, please feel free to submit bugs/thoughts/ideas/suggestions/patches etc.
 

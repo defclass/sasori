@@ -48,20 +48,15 @@
 (def host-infos [{:host "v1"}])
 (def global-opts {:verbose false :color true})
 
-(defn create-nodes []
-  (-> (utils/create-kw-map host-infos global-opts)
-      (dsl/make-nodes)))
-
 (defn do-parallel
   [& [opts]]
-  (let [nodes (create-nodes)
-        init-msgs (map #(sasori/make-msg % opts) nodes)
-        task-vars (sasori/task-vars
-                    remote-base-path
-                    sync-docker-elk
-                    template-docker-compose
-                    docker-build)]
-    (sasori/parallel-tasks init-msgs task-vars)))
+  (let [task-vars (sasori/task-vars
+                   remote-base-path
+                   sync-docker-elk
+                   template-docker-compose
+                   docker-build)]
+    ;; May merge opts into global-opts or context.
+    (sasori/parallel-tasks task-vars host-infos :global-opts global-opts :context nil)))
 
 (defn -main
   " Usage:

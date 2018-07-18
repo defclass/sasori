@@ -25,5 +25,9 @@
     `(join-not-blank
        ~@steps)))
 
+(defn maybe-map? [m]
+  (let [maybe-map-f (some-fn nil? map?)]
+    (maybe-map-f m)))
+
 
 

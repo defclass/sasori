@@ -94,7 +94,7 @@
           (u/error! (format "Key %s is exists in context." k))))
       (update msg :context merge (:value this)))))
 
-(defn context [& [m]]
+(defn make-context [& [m]]
   (assert ((some-fn map? nil?) m))
   (->Context m))
 
@@ -108,7 +108,7 @@
   (instance? Msg x))
 
 (defn- error? [^Msg msg]
-  (assert (instance? Msg msg) "Msg is not Msg instance.")
+  (assert (msg? msg) "Msg is not Msg instance.")
   (some? (:error msg)))
 
 (defn- gen-doc-logger
@@ -180,16 +180,6 @@
         (println (str/join "\n" (:error r)))))
     results))
 
-(defn parallel-tasks [init-msgs vars]
-  {:pre [(and (sequential? vars)
-              (every? var? vars))]}
-  (do-tasks pmap init-msgs vars))
-
-(defn seq-tasks [init-msgs vars]
-  {:pre [(and (sequential? vars)
-              (every? var? vars))]}
-  (do-tasks map init-msgs vars))
-
 (defmacro task-vars
   "Generate task vars from sequence of symbols."
   [& syms]
@@ -197,6 +187,30 @@
   `(vector
      ~@(map (fn [task-sym#] `(var ~task-sym#))
             syms)))
+
+(defn build-init-msgs
+  [host-infos global-opts & [context-m]]
+  (let [nodes (dsl/make-nodes {:host-infos host-infos
+                               :global-opts global-opts})]
+    (map #(make-msg % context-m) nodes)))
+
+(defn- exec-task
+  [map-f task-vars host-infos global-opts context]
+  {:pre [(and (sequential? task-vars)
+              (every? var? task-vars)
+              (sequential? host-infos)
+              (u/maybe-map? global-opts)
+              (u/maybe-map? context))]}
+  (let [init-msgs (build-init-msgs host-infos global-opts context)]
+    (do-tasks map-f init-msgs task-vars)))
+
+(defn parallel-tasks
+  [task-vars host-infos & {:keys [global-opts context]}]
+  (exec-task pmap task-vars host-infos global-opts context))
+
+(defn sequence-tasks
+  [task-vars host-infos & {:keys [global-opts context]}]
+  (exec-task map task-vars host-infos global-opts context))
 
 ;;;; Read from cli
 

@@ -1,4 +1,4 @@
-(defproject defclass/sasori "0.1.0"
+(defproject defclass/sasori "0.1.1"
   :description "A Clojure library designed to wrap and compose shell commands."
   :url "https://github.com/defclass/sasori"
   :license {:name "Eclipse Public License"

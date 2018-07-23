@@ -23,7 +23,7 @@
 
 (defrecord Node [host-info global-opts])
 
-(defn- make-node [{:keys [host-info global-opts]}]
+(defn make-node [{:keys [host-info global-opts]}]
   (let [host (when host-info (make-host-info host-info))
         global-opts (when global-opts (make-global-opts global-opts))]
     (->Node host global-opts)))

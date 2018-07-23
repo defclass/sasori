@@ -11,6 +11,9 @@
              [color :as color]
              [protocols :as protocols]]))
 
+(def make-node dsl/make-node)
+(def make-nodes dsl/make-nodes)
+
 ;;;; Exec
 
 (defn sh-string

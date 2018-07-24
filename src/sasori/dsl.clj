@@ -31,11 +31,11 @@
          global-opts (when global-opts (make-global-opts global-opts))]
      (->Node host global-opts))))
 
-(defn make-nodes [{:keys [host-infos global-opts]}]
-  {:pre (sequential? host-infos)}
-  (let [host-infos (map make-host-info host-infos)
+(defn make-nodes [{:keys [hosts-info global-opts]}]
+  {:pre (sequential? hosts-info)}
+  (let [host-info (map make-host-info hosts-info)
         global-opts (when global-opts (make-global-opts global-opts))]
-    (mapv #(->Node % global-opts) host-infos)))
+    (mapv #(->Node % global-opts) host-info)))
 
 (defn node? [node]
   (instance? Node node))

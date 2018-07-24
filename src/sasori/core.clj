@@ -203,28 +203,29 @@
             syms)))
 
 (defn build-init-msgs
-  [host-infos global-opts & [context-m]]
-  (let [nodes (dsl/make-nodes {:host-infos host-infos
+  [hosts-info global-opts & [context-m]]
+  (let [nodes (dsl/make-nodes {:hosts-info hosts-info
                                :global-opts global-opts})]
     (map #(make-msg % context-m) nodes)))
 
 (defn- exec-task
-  [map-f task-vars host-infos global-opts context]
+  [map-f task-vars hosts-info global-opts context]
   {:pre [(and (sequential? task-vars)
               (every? var? task-vars)
-              (sequential? host-infos)
+              (sequential? hosts-info)
               (u/maybe-map? global-opts)
               (u/maybe-map? context))]}
-  (let [init-msgs (build-init-msgs host-infos global-opts context)]
+  (let [init-msgs (build-init-msgs hosts-info global-opts context)]
     (do-tasks map-f init-msgs task-vars)))
 
-(defn parallel-tasks
-  [task-vars host-infos & {:keys [global-opts context]}]
-  (exec-task pmap task-vars host-infos global-opts context))
-
-(defn sequence-tasks
-  [task-vars host-infos & {:keys [global-opts context]}]
-  (exec-task map task-vars host-infos global-opts context))
+(defn play
+  [task-vars {:keys [parallel? hosts-info global-opts context]
+              :or {parallel? false}}]
+  (when-not (or (map? hosts-info) (sequential? hosts-info))
+    (u/error! "hosts-info is not set or format is wrong."))
+  (let [map-f (if parallel? pmap map)
+        hosts-info (if (sequential? hosts-info) hosts-info [hosts-info])]
+    (exec-task map-f task-vars hosts-info global-opts context)))
 
 ;;;; Read from cli
 

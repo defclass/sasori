@@ -45,7 +45,7 @@
 ;;    HostName ip-or-domain
 ;;    user username
 
-(def host-infos [{:host "v1"}])
+(def host-info {:host "v1"})
 (def global-opts {:verbose false :color true})
 
 (defn do-parallel
@@ -56,7 +56,10 @@
                    template-docker-compose
                    docker-build)]
     ;; May merge opts into global-opts or context.
-    (sasori/parallel-tasks task-vars host-infos :global-opts global-opts :context nil)))
+    (sasori/play task-vars
+                 {:hosts-info host-info
+                  :global-opts global-opts
+                  :context nil})))
 
 (defn -main
   " Usage:

@@ -11,28 +11,29 @@
 
 (deftest test-do-parallel
   (let [task-vars (sasori/task-vars test-local-ls)
-        host-infos [{:host "local"}]
-        result (sasori/parallel-tasks
-                 task-vars host-infos
-                 :global-opts {:verbose false})
+        result (sasori/play task-vars
+                            {:parallel? true
+                             :global-opts {:verbose false}
+                             :hosts-info {:host "local"}})
         stub :stub
-        error-result (sasori/parallel-tasks
-                       task-vars host-infos
-                       :global-opts {:verbose false}
-                       :context {:key-to-test-context stub})]
+        error-result (sasori/play task-vars
+                                  {:parallel? true
+                                   :global-opts {:verbose false}
+                                   :hosts-info {:host "local"}
+                                   :context {:key-to-test-context stub}})]
     (is (not (#'sasori/error? (first result))))
     (is (= stub (-> error-result first :context :key-to-test-context)))))
 
 (deftest test-do-sequence
   (let [task-vars (sasori/task-vars test-local-ls)
-        host-infos [{:host "local"}]
-        result (sasori/sequence-tasks
-                 task-vars host-infos
-                 :global-opts {:verbose false})
+        host-info {:host "local"}
+        result (sasori/play task-vars
+                            {:hosts-info {:host "local"}
+                             :global-opts {:verbose false}})
         stub :stub
-        error-result (sasori/sequence-tasks
-                       task-vars host-infos
-                       :global-opts {:verbose false}
-                       :context {:key-to-test-context stub})]
+        error-result (sasori/play task-vars
+                                  {:hosts-info host-info
+                                   :global-opts {:verbose false}
+                                   :context {:key-to-test-context stub}})]
     (is (not (#'sasori/error? (first result))))
     (is (= stub (-> error-result first :context :key-to-test-context)))))

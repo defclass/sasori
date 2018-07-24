@@ -30,6 +30,17 @@
   (let [cmd-str (dsl/emit dsl node)]
     (sh-string cmd-str (:global-opts node))))
 
+(defn safe-sh-dsl
+  "Same to sh-dsl exception throw exception when return isn't ok."
+  [dsl node]
+  (let [cmd-str (dsl/emit dsl node)
+        result (sh-string cmd-str node)]
+    (if (protocols/ok? result)
+      result
+      (throw (IllegalStateException.
+               (format "Process exec failed: %s"
+                       cmd-str))))))
+
 ;;;; Tools
 
 (defn get-home [node]

@@ -152,8 +152,8 @@
   (when-not (string? dest-path) (u/error! "Dest-path should be string."))
   (let [{:keys [host hostname username]} host-info]
     (if host
-     (str host ":" dest-path)
-     (str username "@" hostname ":" dest-path))))
+      (str host ":" dest-path)
+      (str username "@" hostname ":" dest-path))))
 
 (defrecord Rsync [src dest local-opts]
   protocols/ICmd
@@ -209,11 +209,11 @@
           {:keys [port] :as host} (:host-info node)
           dest (build-scp-dest host dest)
           params-in-s (u/cond-join
-                       verbose "-vv"
-                       recursive "-r"
-                       port (u/join "-P" port)
-                       true src
-                       true dest)]
+                        verbose "-vv"
+                        recursive "-r"
+                        port (u/join "-P" port)
+                        true src
+                        true dest)]
       (u/join-not-blank "scp" params-in-s)))
   (exit? [_] (:exit? local-opts)))
 

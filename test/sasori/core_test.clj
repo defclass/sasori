@@ -21,7 +21,7 @@
                                    :global-opts {:verbose false}
                                    :hosts-info {:host "local"}
                                    :context {:key-to-test-context stub}})]
-    (is (not (#'sasori/error? (first result))))
+    (is (not (sasori/failed-msg? (first result))))
     (is (= stub (-> error-result first :context :key-to-test-context)))))
 
 (deftest test-do-sequence
@@ -35,5 +35,5 @@
                                   {:hosts-info host-info
                                    :global-opts {:verbose false}
                                    :context {:key-to-test-context stub}})]
-    (is (not (#'sasori/error? (first result))))
+    (is (not (sasori/failed-msg? (first result))))
     (is (= stub (-> error-result first :context :key-to-test-context)))))

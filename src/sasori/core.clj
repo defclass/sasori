@@ -121,9 +121,12 @@
 (defn msg? [x]
   (instance? Msg x))
 
-(defn- error? [^Msg msg]
+(defn failed-msg? [^Msg msg]
   (assert (msg? msg) "Msg is not Msg instance.")
   (some? (:error msg)))
+
+(defn success-msg? [^Msg msg]
+  (not (failed-msg? msg)))
 
 (defn- gen-doc-logger
   "Return a log fn which receive a var. This fn will println var's doc or name."
@@ -147,7 +150,7 @@
       resp)))
 
 (defn- task [task-var {:keys [node context] :as msg}]
-  (if (error? msg)
+  (if (failed-msg? msg)
     msg
     (try
       (let [return (do-task task-var node context)]
@@ -172,7 +175,7 @@
       (let [node (:node msg)
             colored-host (log/build-host-info node)
             success-or-failed
-            (if (error? msg)
+            (if (failed-msg? msg)
               (color/wrap-red "Failed." (:global-opts node))
               (color/wrap-green "Success." (:global-opts node)))]
         (println (format "%s: %s" colored-host success-or-failed))))
@@ -189,7 +192,7 @@
                 init-msgs
                 tasks)]
     (doseq [r results]
-      (when (error? r)
+      (when (failed-msg? r)
         (println (format "[%s] Found Error: " (log/build-host-info (:node r))))
         (println (str/join "\n" (:error r)))))
     results))

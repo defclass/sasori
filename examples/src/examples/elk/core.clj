@@ -9,7 +9,7 @@
   "Ensure remote base path."
   [node _]
   (let [remote-base-path (str (sasori/get-home node) "/elk")]
-    (sasori/context (utils/create-kw-map remote-base-path))))
+    (sasori/make-context (utils/create-kw-map remote-base-path))))
 
 (defn sync-docker-elk
   [node {:keys [remote-base-path]}]
@@ -48,27 +48,28 @@
 (def host-info {:host "v1"})
 (def global-opts {:verbose false :color true})
 
-(defn do-parallel
+(defn play
   [& [opts]]
-  (let [task-vars (sasori/task-vars
-                   remote-base-path
-                   sync-docker-elk
-                   template-docker-compose
-                   docker-build)]
-    ;; May merge opts into global-opts or context.
+  (let [parallel? (:parallel? opts)
+        task-vars (sasori/task-vars
+                    remote-base-path
+                    sync-docker-elk
+                    template-docker-compose
+                    docker-build)]
     (sasori/play task-vars
-                 {:hosts-info host-info
+                 {:parallel? parallel?
+                  :hosts-info host-info
                   :global-opts global-opts
                   :context nil})))
 
 (defn -main
   " Usage:
 
-  lein run -m examples.elk.core '{:args1 \"value1\" :args2 \"value2\"}'
+  lein run -m examples.elk.core '{:parallel? true}'
   "
   [& args]
   (let [args-m (sasori/parse-from-clj args)]
-    (do-parallel args-m)
+    (play args-m)
     ;; JVM will wait for `clojure-agent-send-off-pool-x` exit, so need exit
     ;; manually.
     (System/exit 0)))
@@ -76,7 +77,7 @@
 
 ; output:
 ;
-;$ lein run -m examples.elk.core
+;$ lein run -m examples.elk.core '{:parallel? true}'
 ;Exec: Ensure remote base path.
 ;v1: Success.
 ;

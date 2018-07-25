@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [sasori
              [core :as sasori]
-             [dsl :as dsl]]))
+             [dsl :as dsl]]
+            [sasori.protocols :as protocols]))
 
 (defn test-local-ls
   [node context]
@@ -37,3 +38,9 @@
                                    :context {:key-to-test-context stub}})]
     (is (not (sasori/failed-msg? (first result))))
     (is (= stub (-> error-result first :context :key-to-test-context)))))
+
+(deftest test-context-merge-msg
+  (let [m {:a 1 :b 2}
+        context (sasori/make-context m)
+        msg (sasori/make-msg (sasori/make-node))]
+    (is (= m (-> (protocols/merge-to-msg context msg) :context)))))

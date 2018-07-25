@@ -102,7 +102,7 @@
 (defrecord Context [value]
   protocols/ITaskReturn
   (merge-to-msg [this msg]
-    (let [ks (keys this)]
+    (let [ks (keys (:value this))]
       (doseq [k ks]
         (when (contains? (:context msg) k)
           (u/error! (format "Key %s is exists in context." k))))
@@ -122,7 +122,8 @@
   (instance? Msg x))
 
 (defn failed-msg? [^Msg msg]
-  (assert (msg? msg) "Msg is not Msg instance.")
+  (when-not (msg? msg)
+    (u/error! "Msg is not Msg instance." {:msg msg}))
   (some? (:error msg)))
 
 (defn success-msg? [^Msg msg]

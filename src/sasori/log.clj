@@ -9,10 +9,10 @@
   (let [date (new java.util.Date)]
     (.format time-formatter date)))
 
-(defn build-host-info [node]
-  (let [{:keys [host hostname]} (:host-info node)]
+(defn build-host-info [m]
+  (let [{:keys [host hostname]} m]
     (-> (or host hostname "local")
-        (color/wrap-host (:global-opts node)))))
+        (color/wrap-host m))))
 
 (def levels (atom #{:info :error}))
 

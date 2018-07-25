@@ -37,8 +37,8 @@
     (when-let [dir (:dir opts)]
       (.directory builder (io/file dir)))
     (when (= :very (:verbose opts))
-      (when-let [env (:env opts)] (log/info {:env env}))
-      (when-let [dir (:dir opts)] (log/info {:dir dir})))
+      (when-let [env (:env opts)] (log/info {:env env} opts))
+      (when-let [dir (:dir opts)] (log/info {:dir dir} opts)))
     (let [proc (.start builder)
           in (:in opts)]
       (if in

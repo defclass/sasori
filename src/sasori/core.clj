@@ -21,14 +21,15 @@
   {:pre [(or (nil? args) (map? args))]}
   (let [args-in-seq (flatten (seq args))]
     (when (:verbose args)
-      (log/info cmd))
+      (log/info cmd args))
     (->> (into ["/bin/sh" "-c" cmd] args-in-seq)
          (apply exec/sh))))
 
 (defn sh-dsl
   [dsl node]
   (let [cmd-str (dsl/emit dsl node)]
-    (sh-string cmd-str (:global-opts node))))
+    (->> (u/node->opts-m node)
+         (sh-string cmd-str))))
 
 (defn safe-sh-dsl
   "Same to sh-dsl exception throw exception when return isn't ok."
@@ -132,11 +133,13 @@
 (defn- gen-doc-logger
   "Return a log fn which receive a var. This fn will println var's doc or name."
   [fmt]
-  (fn [v opts]
+  (fn [v node]
+    (when-not (dsl/node? node))
     (let [m (meta v)
           description (or (:doc m) (:name m))
           msg (format fmt description)]
-      (log/info msg opts))))
+      (->> (u/node->opts-m node)
+           (log/info msg)))))
 
 (def start-logger (gen-doc-logger "Starting: %s"))
 (def done-logger (gen-doc-logger "Done: %s"))
@@ -174,7 +177,7 @@
          (println))
     (doseq [msg msgs]
       (let [node (:node msg)
-            colored-host (log/build-host-info node)
+            colored-host (log/build-host-info (u/node->opts-m node))
             success-or-failed
             (if (failed-msg? msg)
               (color/wrap-red "Failed." (:global-opts node))

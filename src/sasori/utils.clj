@@ -29,5 +29,9 @@
   (let [maybe-map-f (some-fn nil? map?)]
     (maybe-map-f m)))
 
+(defn node->opts-m [node]
+  (let [{:keys [global-opts host-info]} node]
+    (merge host-info global-opts)))
+
 
 

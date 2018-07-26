@@ -14,6 +14,10 @@
 (def make-node dsl/make-node)
 (def make-nodes dsl/make-nodes)
 
+(defn local? [node]
+  (dsl/check-node-type! node)
+  (get-in node [:host-info :local?]))
+
 ;;;; Exec
 
 (defn sh-string

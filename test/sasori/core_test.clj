@@ -42,5 +42,13 @@
 (deftest test-context-merge-msg
   (let [m {:a 1 :b 2}
         context (sasori/make-context m)
-        msg (sasori/make-msg (sasori/make-node))]
+        msg (sasori/make-msg (sasori/make-node {:host-info {:local? true}}))]
     (is (= m (-> (protocols/merge-to-msg context msg) :context)))))
+
+(deftest test-local
+  (testing "local"
+    (is (true? (-> (sasori/make-node {:host-info {:local? true}})
+                   (sasori/local?)))))
+  (testing "remote"
+    (is (false? (-> (dsl/make-node {:host-info {:host "v1"}})
+                    (sasori/local?))))))

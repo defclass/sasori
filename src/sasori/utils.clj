@@ -1,5 +1,6 @@
 (ns sasori.utils
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str])
+  (:refer-clojure :exclude [boolean?]))
 
 (defn error! [msg & [map]]
   (let [map (or map {})]
@@ -33,5 +34,8 @@
   (let [{:keys [global-opts host-info]} node]
     (merge host-info global-opts)))
 
-
+(defn boolean?
+  "Return true if x is a Boolean"
+  [x]
+  (instance? Boolean x))
 

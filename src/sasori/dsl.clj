@@ -7,13 +7,16 @@
              [utils :as u]
              [protocols :as protocols]]))
 
-(defrecord HostInfo [host hostname port username])
+(defrecord HostInfo [local? host hostname port username])
 
-(defn make-host-info [{:keys [host hostname port username]}]
-  (when-not (or (every? string? [hostname username])
-                (some? host))
-    (u/error! "Host or `hostname && username` should be set."))
-  (->HostInfo host hostname port username))
+(defn make-host-info [{:keys [local? host hostname port username]}]
+  (when-not (u/boolean? local?)
+    (u/error! "Should set local? a boolean value."))
+  (when-not local?
+    (when-not (or (every? string? [hostname username])
+                  (some? host))
+      (u/error! "Host or `hostname && username` should be set.")))
+  (->HostInfo local? host hostname port username))
 
 (defrecord GlobalOpts [verbose in env dir clear-env color])
 
@@ -24,24 +27,27 @@
 (defrecord Node [host-info global-opts])
 
 (defn make-node
-  ([]
-   (make-node nil))
-  ([{:keys [host-info global-opts]}]
-   (let [host (when host-info (make-host-info host-info))
-         global-opts (when global-opts (make-global-opts global-opts))]
-     (->Node host global-opts))))
-
-(defn make-nodes [{:keys [hosts-info global-opts]}]
-  {:pre (sequential? hosts-info)}
-  (let [host-info (map make-host-info hosts-info)
+  [{:keys [host-info global-opts] :as m}]
+  (when (contains? m :local?)
+    (u/error! ":local key should in host-info map."))
+  (let [local? (true? (:local? host-info))
+        host (make-host-info (assoc host-info :local? local?))
         global-opts (when global-opts (make-global-opts global-opts))]
-    (mapv #(->Node % global-opts) host-info)))
+    (->Node host global-opts)))
+
+(defn make-nodes
+  [{:keys [hosts-info global-opts]}]
+  {:pre (sequential? hosts-info)}
+  (let [make-node-fn
+        (fn [host-info] (make-node {:host-info host-info :global-opts global-opts}))]
+    (map make-node-fn hosts-info)))
 
 (defn node? [node]
   (instance? Node node))
 
-(defn assert-node! [node]
-  (assert (node? node) "Should be node."))
+(defn check-node-type! [node]
+  (when-not (node? node)
+    (u/error! "Should be node." {:node node})))
 
 (defn cmd? [x]
   (satisfies? protocols/ICmd x))
@@ -66,7 +72,7 @@
 (defrecord Cmds [seq-cmds local-opts]
   protocols/ICmd
   (plain [_ node]
-    (assert-node! node)
+    (check-node-type! node)
     (loop [acc "" [f & r] seq-cmds]
       (if (nil? f)
         acc
@@ -112,7 +118,7 @@
 (defrecord Ssh [seq-cmds local-opts]
   protocols/ICmd
   (plain [_ node]
-    (assert-node! node)
+    (check-node-type! node)
     (let [conn-info (build-ssh-conn (:host-info node))]
       (->> (protocols/plain seq-cmds node)
            (escape-cmd)
@@ -131,7 +137,7 @@
 (defrecord Sudo [cmd local-opts]
   protocols/ICmd
   (plain [_ node]
-    (assert-node! node)
+    (check-node-type! node)
     ;; sudo sh -c would fit `sudo cmd > some-file-need-privilege`
     (format "sudo sh -c '%s'" (protocols/plain cmd node)))
   (exit? [_] (:exit? local-opts)))
@@ -221,7 +227,9 @@
   [src dest & [local-opts]]
   (->Scp src dest local-opts))
 
+(def local-node (make-node {:host-info {:local? true}}))
+
 (defn emit [cmd & [node]]
   (assert (cmd? cmd))
-  (let [node (if (some? node) node (make-node {}))]
+  (let [node (if (some? node) node local-node)]
     (protocols/plain cmd node)))

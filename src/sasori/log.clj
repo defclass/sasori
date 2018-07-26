@@ -1,6 +1,7 @@
 (ns sasori.log
   (:require [clojure.string :as str])
-  (:require [sasori.color :as color])
+  (:require [sasori.color :as color]
+            [sasori.utils :as u])
   (:import (java.text SimpleDateFormat)))
 
 (def time-formatter (SimpleDateFormat. "HH:mm:ss"))
@@ -10,9 +11,11 @@
     (.format time-formatter date)))
 
 (defn build-host-info [m]
-  (let [{:keys [host hostname]} m]
-    (-> (or host hostname "local")
-        (color/wrap-host m))))
+  (let [{:keys [local? host hostname]} m
+        host (if local? "local" (or host hostname))]
+    (when-not (string? host)
+      (u/error! "Unknown host" {:m m}))
+    (color/wrap-host host m)))
 
 (def levels (atom #{:info :error}))
 

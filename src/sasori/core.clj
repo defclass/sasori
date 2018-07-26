@@ -100,6 +100,8 @@
     `(let ~new-bindings
        ~@body)))
 
+;; Context are keys/values (map) that shared between tasks.
+
 (defrecord Context [value]
   protocols/ITaskReturn
   (merge-to-msg [this msg]
@@ -113,7 +115,9 @@
   (assert ((some-fn map? nil?) m))
   (->Context m))
 
-;; Msg passed between tasks
+;; A msg is everything needed by one task, including share context , node
+;; information, and error if ever produced.
+
 (defrecord Msg [node context error])
 
 (defn make-msg [node & [init-content]]

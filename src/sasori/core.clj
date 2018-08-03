@@ -205,7 +205,9 @@
                 tasks)]
     (doseq [r results]
       (when (failed-msg? r)
-        (println (format "[%s] Found Error: " (log/build-host-info (:node r))))
+        (let [host-info (-> (u/node->opts-m (:node r))
+                            (log/build-host-info))]
+          (println (format "[%s] Found Error: " host-info)))
         (println (str/join "\n" (:error r)))))
     results))
 

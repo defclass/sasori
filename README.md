@@ -15,13 +15,6 @@ Sasori is a lightweight shell command wrapper and composer. This is very early v
 
 Add sasori dependence.
 
-snapshot:
-
-```
-[defclass/sasori "0.1.2-SNAPSHOT"]
-```
-
-
 stable:
 
 [![Clojars Project](https://img.shields.io/clojars/v/defclass/sasori.svg)](https://clojars.org/defclass/sasori)
